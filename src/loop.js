@@ -3,42 +3,44 @@ global.timeDelta = 16
 function loop() {
   this.timePassedMS = 0
   this.lastTime = 0
-  startedAt = null
+  this.startedAt = null
 
-  renderer = new THREE.WebGLRenderer({
-    antialias: true
+  const renderer = new THREE.WebGLRenderer({
+    antialias: true,
   })
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement).id = 'canvas';
-  step()
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  document.body.appendChild(renderer.domElement).id = 'canvas'
 
 
   function updateGameObjects() {
-    for (const key in gameObjects) {
-      gameObjects[key].update()
-    }
+    Object.values(gameObjects).forEach((go) => {
+      if (go.update) {
+        go.update()
+      }
+    })
   }
 
   function step(timestamp) {
-    if (!startedAt) startedAt = timestamp
+    if (!this.startedAt) this.startedAt = timestamp
 
-    if (lastTime) {
-      global.timeDelta = timestamp - lastTime
+    if (this.lastTime) {
+      global.timeDelta = timestamp - this.lastTime
     }
 
     updateGameObjects()
 
-    timePassedMS = global.timeDelta + timePassedMS
+    this.timePassedMS = global.timeDelta + this.timePassedMS
 
-    lastTime = timestamp
+    this.lastTime = timestamp
 
     window.requestAnimationFrame(step)
     renderer.render(global.scene, global.camera)
   }
 
+  step()
 }
 
 module.exports = {
-  initLoop: loop
+  initLoop: loop,
 }

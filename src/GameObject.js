@@ -1,7 +1,7 @@
 module.exports = class GameObject {
-  constructor({} = {}) {
-      
-  }
-  render() {}
-  update() {}
+  // constructor({} = {}) {
+
+  // }
+
+  // update() {}
 }

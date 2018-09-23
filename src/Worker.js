@@ -1,5 +1,4 @@
 const GameObject = require('./GameObject')
-const _ = require('lodash')
 
 module.exports = class Worker extends GameObject {
   constructor(args) {
@@ -10,12 +9,5 @@ module.exports = class Worker extends GameObject {
     this.mesh = new THREE.Mesh(geometry, material)
 
     scene.add(this.mesh)
-
-  }
-  update() {
-
-  }
-  render() {
-
   }
 }
