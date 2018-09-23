@@ -1,5 +1,5 @@
 // const _ = require('lodash')
-const GameObject = require('./GameObject')
+const GameObject = require('../core/GameObject')
 
 module.exports = class Ground extends GameObject {
   constructor(args) {

@@ -3,6 +3,8 @@ module.exports = {
     rules: {
         semi: ["error", "never"],
         "arrow-parens": 0,
+        "consistent-return": 0,
+        "class-methods-use-this": 0
     },
     globals: {
         THREE: true,
@@ -11,6 +13,8 @@ module.exports = {
         window: true,
         camera: true,
         gameObjects: true,
-        document: true
+        document: true,
+        findTag: true,
+        Vector3: true
     }
 };

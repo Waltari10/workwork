@@ -5,7 +5,7 @@ window.THREE = THREE
 require('three/examples/js/controls/MapControls')
 const uniqid = require('uniqid')
 const { initLoop } = require('./loop')
-const { createScene } = require('./MapScene')
+const { createScene } = require('../MapScene')
 
 global.gameObjects = {}
 global.instantiate = function instantiate(ClassTemplate, args) {
@@ -16,6 +16,19 @@ global.instantiate = function instantiate(ClassTemplate, args) {
 }
 global.destroy = function destroy(instance) {
   delete gameObjects[instance.id]
+}
+
+global.Vector3 = function Vector3(x, y, z) {
+  return new THREE.Vector3(x, y, z)
+}
+
+global.findTag = function findTag(tag) {
+  return Object.values(gameObjects).find(go => {
+    if (go.tags && go.tags.includes(tag)) {
+      return true
+    }
+    return false
+  })
 }
 
 function initScene() {

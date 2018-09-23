@@ -1,0 +1,5 @@
+module.exports = {
+  TREE: 'TREE',
+  BUILDING: 'BUILDING',
+  CONSTRUCTION: 'CONSTRUCTION',
+}
