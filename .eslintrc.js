@@ -4,7 +4,9 @@ module.exports = {
         semi: ["error", "never"],
         "arrow-parens": 0,
         "consistent-return": 0,
-        "class-methods-use-this": 0
+        "class-methods-use-this": 0,
+        "no-plusplus": 0,
+        "operator-linebreak": 0
     },
     globals: {
         THREE: true,

@@ -29,5 +29,7 @@ module.exports = class House extends Building {
     }
 
     this.timeRequirement = 5000
+
+    this.isFrozen = true
   }
 }

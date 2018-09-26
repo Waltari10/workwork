@@ -9,11 +9,12 @@ function createScene() {
   global.camera = new THREE.PerspectiveCamera(
     70,
     window.innerWidth / window.innerHeight,
-    0.01,
+    0.0000001,
   )
 
+
   const controls = new THREE.MapControls(camera)
-  camera.position.set(0, 0, 4)
+  camera.position.set(0, 0, 2)
   controls.update()
 
   instantiate(Worker, {

@@ -37,6 +37,8 @@ module.exports = class Worker extends Actor {
     scene.add(this.mesh)
 
     this.setState(AI_STATES.IDLE)
+
+    this.tag = 'WORKER'
   }
 
   findJob() {
@@ -95,8 +97,13 @@ module.exports = class Worker extends Actor {
   }
 
   update() {
-    this.move()
+    // TODO somehow first call GO update and then worker UPDATE
+    super.update()
+    // https:// www.andrewzammit.com/blog/javascript-inheritance-and-method-overriding/
+    // https://oli.me.uk/2013/06/01/prototypical-inheritance-done-right/
+    // https://stackoverflow.com/questions/39263358/super-keyword-unexpected-here
 
+    this.move()
 
     if (this.destination) return
 
@@ -115,12 +122,6 @@ module.exports = class Worker extends Actor {
 
       default:
         break
-    }
-
-    if (this.state.IDLE) {
-      this.findJob()
-      // What jobs exist
-      // Do job
     }
   }
 }

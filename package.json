@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.4",
+    "perlin-noise": "0.0.1",
     "three": "^0.96.0",
     "uniqid": "^4.1.1",
     "victor": "^1.1.0",

@@ -1,10 +1,11 @@
+const _ = require('lodash')
 const GameObject = require('./GameObject')
 const {
   ATTACK,
   CHOP_WOOD,
 } = require('../constants/actions')
+const Worker = require('../WorldObjects/Worker')
 
-const _ = require('lodash')
 
 module.exports = class Actor extends GameObject {
   constructor({
@@ -43,12 +44,15 @@ module.exports = class Actor extends GameObject {
 
       this.mesh.position.sub(clamped)
 
-      this.position = this.mesh.position
+      this.position.x = this.mesh.position.x
+      this.position.y = this.mesh.position.y
 
       if (this.mesh.position.distanceTo(this.destination) < this.reach) {
         delete this.destination
       }
     }
+
+    this.mesh.position.z = this.position.z
   }
 
   chopWood() {
@@ -58,8 +62,8 @@ module.exports = class Actor extends GameObject {
   }
 
   action(type) {
-    console.log(type)
     if (this.lastActionMS + this.actionCooldownMS > Date.now()) return
+    console.log(type)
     this.lastActionMS = Date.now()
     switch (type) {
       case CHOP_WOOD:
