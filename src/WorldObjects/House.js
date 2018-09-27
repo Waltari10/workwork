@@ -21,7 +21,7 @@ module.exports = class House extends Building {
     this.tags.push(CONSTRUCTION)
 
     this.resourceRequirements = {
-      wood: 10,
+      wood: 100,
     }
 
     this.resources = {

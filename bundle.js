@@ -67822,6 +67822,7 @@ function createScene() {
   instantiate(Worker, {
     position: Vector3(2, 0, 0),
   })
+
   instantiate(Sun)
 
   instantiate(Ground)
@@ -68013,7 +68014,7 @@ module.exports = class House extends Building {
     this.tags.push(CONSTRUCTION)
 
     this.resourceRequirements = {
-      wood: 10,
+      wood: 100,
     }
 
     this.resources = {
@@ -68397,6 +68398,8 @@ module.exports = class GameObject {
 (function (global){
 global.timeDelta = 16
 
+const timer = require('../dev/timer')
+
 function loop() {
   this.timePassedMS = 0
   this.lastTime = 0
@@ -68419,6 +68422,7 @@ function loop() {
   }
 
   function step(timestamp) {
+    timer.start()
     if (!this.startedAt) this.startedAt = timestamp
 
     if (this.lastTime) {
@@ -68433,6 +68437,7 @@ function loop() {
 
     window.requestAnimationFrame(step)
     renderer.render(global.scene, global.camera)
+    timer.end()
   }
 
   step()
@@ -68443,7 +68448,7 @@ module.exports = {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],30:[function(require,module,exports){
+},{"../dev/timer":31}],30:[function(require,module,exports){
 (function (global){
 const THREE = require('three')
 
@@ -68489,4 +68494,18 @@ initScene()
 initLoop()
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../MapScene":15,"./loop":29,"three":10,"three/examples/js/QuickHull":11,"three/examples/js/controls/MapControls":12,"three/examples/js/geometries/ConvexGeometry":13,"uniqid":14}]},{},[30]);
+},{"../MapScene":15,"./loop":29,"three":10,"three/examples/js/QuickHull":11,"three/examples/js/controls/MapControls":12,"three/examples/js/geometries/ConvexGeometry":13,"uniqid":14}],31:[function(require,module,exports){
+const timer = {
+  start: () => {
+    this.start = Date.now()
+  },
+  end: () => {
+    /* eslint-disable-line no-console */
+    console.log(Date.now() - this.start)
+  },
+}
+
+
+module.exports = timer
+
+},{}]},{},[30]);
