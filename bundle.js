@@ -67889,18 +67889,26 @@ module.exports = class Ground extends GameObject {
       persistence: 0.2, // 0.2
     }
 
-    const xRes = 20
-    const yRes = 20
+    const treesPerSquareUnit = 3
 
-    const noise = perlin.generatePerlinNoise(100, 100, options)
+    const totalSquareUnits = this.sizeX * this.sizeY
+
+    const treesTotal = totalSquareUnits * treesPerSquareUnit
+
+    const resolution = Math.sqrt(treesTotal)
+
+    const noise = perlin.generatePerlinNoise(Math.ceil(resolution), Math.ceil(resolution), options)
 
     let i = 0
-    for (let x = 0; x < xRes; x++) {
-      for (let y = 0; y < yRes; y++) {
+    for (let x = 0; x < resolution; x++) {
+      for (let y = 0; y < resolution; y++) {
         const h = noise[i]
 
-        const positionX = ((x / xRes) * this.sizeX) - (this.sizeX / 2) + 1 // Why plus one?
-        const positionY = ((y / yRes) * this.sizeY) - (this.sizeY / 2) + 1
+        let positionX = ((x / resolution) * this.sizeX) - (this.sizeX / 2) + 1 // Why plus one?
+        let positionY = ((y / resolution) * this.sizeY) - (this.sizeY / 2) + 1
+
+        positionX += _.random(-0.5, 0.5, true)
+        positionY += _.random(-0.5, 0.5, true)
 
         const origin = new THREE.Vector3(positionX, positionY, 5)
         let direction = new THREE.Vector3(0, 0, -1)
@@ -67958,16 +67966,7 @@ module.exports = class Ground extends GameObject {
     let i = 0
     for (let x = 0; x < actualResolutionX; x++) {
       for (let y = 0; y < actualResolutionY; y++) {
-        let h = noise[i]
-
-        if (
-          x > (actualResolutionX / 3) &&
-          x < (actualResolutionX / 3) * 2 &&
-          y > (actualResolutionY / 3) &&
-          y < (actualResolutionY / 3) * 2
-        ) {
-          h = 0.5
-        }
+        const h = noise[i]
 
         this.geometryPlane.vertices[i].z = h
         i++
