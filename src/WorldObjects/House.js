@@ -9,12 +9,10 @@ module.exports = class House extends Building {
     const material = new THREE.MeshBasicMaterial({ color: 'gray', side: THREE.DoubleSide })
     const plane = new THREE.Mesh(geometry, material)
     scene.add(plane)
-
     this.mesh = plane
 
     plane.position.x = args.position.x
     plane.position.y = args.position.y
-    plane.position.z = args.position.z
 
     this.tags = []
     this.tags.push(BUILDING)
@@ -31,5 +29,11 @@ module.exports = class House extends Building {
     this.timeRequirement = 5000
 
     this.isFrozen = true
+    plane.position.z = this.snapToGround()
+  }
+
+  update() {
+    super.update()
+
   }
 }

@@ -4,6 +4,7 @@ const raycaster = new THREE.Raycaster()
 const { GROUND_NAME } = require('../constants/names')
 const { MAX_GROUND_HEIGHT } = require('../constants/other')
 
+const _ = require('lodash')
 
 module.exports = class GameObject {
   constructor({
@@ -40,7 +41,12 @@ module.exports = class GameObject {
         return false
       })
       this.position.z = groundIntersection.point.z
+      if (this.mesh) {
+        this.mesh.position.z = groundIntersection.point.z
+      }
+      return groundIntersection.point.z
     }
+    return 0
   }
 
   update() {

@@ -67998,12 +67998,10 @@ module.exports = class House extends Building {
     const material = new THREE.MeshBasicMaterial({ color: 'gray', side: THREE.DoubleSide })
     const plane = new THREE.Mesh(geometry, material)
     scene.add(plane)
-
     this.mesh = plane
 
     plane.position.x = args.position.x
     plane.position.y = args.position.y
-    plane.position.z = args.position.z
 
     this.tags = []
     this.tags.push(BUILDING)
@@ -68020,6 +68018,12 @@ module.exports = class House extends Building {
     this.timeRequirement = 5000
 
     this.isFrozen = true
+    plane.position.z = this.snapToGround()
+  }
+
+  update() {
+    super.update()
+
   }
 }
 
@@ -68350,6 +68354,7 @@ const raycaster = new THREE.Raycaster()
 const { GROUND_NAME } = require('../constants/names')
 const { MAX_GROUND_HEIGHT } = require('../constants/other')
 
+const _ = require('lodash')
 
 module.exports = class GameObject {
   constructor({
@@ -68386,7 +68391,12 @@ module.exports = class GameObject {
         return false
       })
       this.position.z = groundIntersection.point.z
+      if (this.mesh) {
+        this.mesh.position.z = groundIntersection.point.z
+      }
+      return groundIntersection.point.z
     }
+    return 0
   }
 
   update() {
@@ -68396,7 +68406,7 @@ module.exports = class GameObject {
   }
 }
 
-},{"../constants/names":23,"../constants/other":24}],29:[function(require,module,exports){
+},{"../constants/names":23,"../constants/other":24,"lodash":2}],29:[function(require,module,exports){
 (function (global){
 global.timeDelta = 16
 
