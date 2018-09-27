@@ -3,7 +3,7 @@ const timer = {
     this.start = Date.now()
   },
   end: () => {
-    /* eslint-disable-line no-console */
+    /* eslint-disable no-console */
     console.log(Date.now() - this.start)
   },
 }
