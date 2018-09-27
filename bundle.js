@@ -67822,14 +67822,10 @@ function createScene() {
   instantiate(Worker, {
     position: Vector3(2, 0, 0),
   })
-
   instantiate(Sun)
 
   instantiate(Ground)
 
-  instantiate(Tree, {
-    position: Vector3(0, 0, 0),
-  })
   instantiate(House, {
     position: Vector3(2, 2, 0.01),
   })
@@ -68042,6 +68038,7 @@ module.exports = class Sun extends GameObject {
 },{"../core/GameObject":28}],20:[function(require,module,exports){
 const GameObject = require('../core/GameObject')
 const { TREE } = require('../constants/tags')
+const _ = require('lodash')
 
 module.exports = class Tree extends GameObject {
   constructor(args) {
@@ -68064,31 +68061,36 @@ module.exports = class Tree extends GameObject {
   }
 
   createMesh() {
+    const pivot = new THREE.Object3D()
+    pivot.position.x = this.position.x
+    pivot.position.y = this.position.y
+    pivot.position.z = this.position.z
     const pine = new THREE.MeshBasicMaterial({ color: '#2d9e44' })
     const trunk = new THREE.MeshBasicMaterial({ color: '#1e4726' })
 
     const coneGeometry = new THREE.ConeGeometry(0.3, 0.9, 16)
     const cone = new THREE.Mesh(coneGeometry, pine)
     cone.rotation.x = Math.PI * 0.5
-    cone.position.z = 0.48 + this.position.z
-    cone.position.x = this.position.x
-    cone.position.y = this.position.y
-    scene.add(cone)
-    this.mesh = cone
+    cone.position.z = 0.48
+    pivot.add(cone)
 
 
     const cylinderGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.03, 8)
     const cylinder = new THREE.Mesh(cylinderGeometry, trunk)
-    cylinder.position.x = this.position.x
-    cylinder.position.y = this.position.y
-    cylinder.position.z = 0.015 + this.position.z
-    scene.add(cylinder)
-
+    cylinder.position.z = 0.015
     cylinder.rotation.x = Math.PI * 0.5
+    pivot.add(cylinder)
+
+    pivot.rotation.x += _.random(-Math.PI / 18, Math.PI / 18, true)
+    pivot.rotation.y += _.random(-Math.PI / 18, Math.PI / 18, true)
+    pivot.rotation.z = _.random(Math.PI * 2, true)
+    scene.add(pivot)
+
+    this.mesh = pivot
   }
 }
 
-},{"../constants/tags":25,"../core/GameObject":28}],21:[function(require,module,exports){
+},{"../constants/tags":25,"../core/GameObject":28,"lodash":2}],21:[function(require,module,exports){
 const _ = require('lodash')
 const Actor = require('../core/Actor')
 const {
@@ -68398,8 +68400,6 @@ module.exports = class GameObject {
 (function (global){
 global.timeDelta = 16
 
-const timer = require('../dev/timer')
-
 function loop() {
   this.timePassedMS = 0
   this.lastTime = 0
@@ -68422,7 +68422,6 @@ function loop() {
   }
 
   function step(timestamp) {
-    timer.start()
     if (!this.startedAt) this.startedAt = timestamp
 
     if (this.lastTime) {
@@ -68437,7 +68436,6 @@ function loop() {
 
     window.requestAnimationFrame(step)
     renderer.render(global.scene, global.camera)
-    timer.end()
   }
 
   step()
@@ -68448,7 +68446,7 @@ module.exports = {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../dev/timer":31}],30:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 (function (global){
 const THREE = require('three')
 
@@ -68494,18 +68492,4 @@ initScene()
 initLoop()
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../MapScene":15,"./loop":29,"three":10,"three/examples/js/QuickHull":11,"three/examples/js/controls/MapControls":12,"three/examples/js/geometries/ConvexGeometry":13,"uniqid":14}],31:[function(require,module,exports){
-const timer = {
-  start: () => {
-    this.start = Date.now()
-  },
-  end: () => {
-    /* eslint-disable-line no-console */
-    console.log(Date.now() - this.start)
-  },
-}
-
-
-module.exports = timer
-
-},{}]},{},[30]);
+},{"../MapScene":15,"./loop":29,"three":10,"three/examples/js/QuickHull":11,"three/examples/js/controls/MapControls":12,"three/examples/js/geometries/ConvexGeometry":13,"uniqid":14}]},{},[30]);

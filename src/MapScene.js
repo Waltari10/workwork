@@ -17,9 +17,6 @@ function createScene() {
 
   instantiate(Ground)
 
-  instantiate(Tree, {
-    position: Vector3(0, 0, 0),
-  })
   instantiate(House, {
     position: Vector3(2, 2, 0.01),
   })
