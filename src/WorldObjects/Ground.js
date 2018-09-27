@@ -14,7 +14,6 @@ module.exports = class Ground extends GameObject {
     this.sizeX = 20
     this.sizeY = 20
 
-    this.createLight()
     this.createGround()
     this.addTrees()
     this.addWater()
@@ -78,11 +77,6 @@ module.exports = class Ground extends GameObject {
         i++
       }
     }
-  }
-
-  createLight() {
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
-    scene.add(directionalLight)
   }
 
   createGround() {

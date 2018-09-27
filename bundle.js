@@ -67807,29 +67807,22 @@ function macHandler(error){
 
 }).call(this,require('_process'))
 },{"_process":9,"macaddress":3}],15:[function(require,module,exports){
-(function (global){
 // const _ = require('lodash')
 
 const Worker = require('./WorldObjects/Worker.js')
 const Ground = require('./WorldObjects/Ground.js')
 const Tree = require('./WorldObjects/Tree.js')
 const House = require('./WorldObjects/House.js')
+const Sun = require('./WorldObjects/Sun.js')
+const Camera = require('./WorldObjects/Camera.js')
 
 function createScene() {
-  global.camera = new THREE.PerspectiveCamera(
-    70,
-    window.innerWidth / window.innerHeight,
-    0.0000001,
-  )
-
-
-  const controls = new THREE.MapControls(camera)
-  camera.position.set(0, 0, 2)
-  controls.update()
+  instantiate(Camera)
 
   instantiate(Worker, {
     position: Vector3(2, 0, 0),
   })
+  instantiate(Sun)
 
   instantiate(Ground)
 
@@ -67845,8 +67838,29 @@ module.exports = {
   createScene,
 }
 
+},{"./WorldObjects/Camera.js":16,"./WorldObjects/Ground.js":17,"./WorldObjects/House.js":18,"./WorldObjects/Sun.js":19,"./WorldObjects/Tree.js":20,"./WorldObjects/Worker.js":21}],16:[function(require,module,exports){
+(function (global){
+
+const GameObject = require('../core/GameObject')
+
+module.exports = class Sun extends GameObject {
+  constructor(args) {
+    super(args)
+
+    global.camera = new THREE.PerspectiveCamera(
+      70,
+      window.innerWidth / window.innerHeight,
+      0.0000001,
+    )
+
+    const controls = new THREE.MapControls(camera)
+    camera.position.set(0, 0, 15)
+    controls.update()
+  }
+}
+
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./WorldObjects/Ground.js":16,"./WorldObjects/House.js":17,"./WorldObjects/Tree.js":18,"./WorldObjects/Worker.js":19}],16:[function(require,module,exports){
+},{"../core/GameObject":28}],17:[function(require,module,exports){
 const _ = require('lodash')
 const perlin = require('perlin-noise')
 const GameObject = require('../core/GameObject')
@@ -67863,7 +67877,6 @@ module.exports = class Ground extends GameObject {
     this.sizeX = 20
     this.sizeY = 20
 
-    this.createLight()
     this.createGround()
     this.addTrees()
     this.addWater()
@@ -67929,11 +67942,6 @@ module.exports = class Ground extends GameObject {
     }
   }
 
-  createLight() {
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
-    scene.add(directionalLight)
-  }
-
   createGround() {
     const options = {
       octaveCount: 4, // 4 defaults
@@ -67981,7 +67989,7 @@ module.exports = class Ground extends GameObject {
   }
 }
 
-},{"../WorldObjects/Tree":18,"../constants/names":21,"../core/GameObject":26,"lodash":2,"perlin-noise":8}],17:[function(require,module,exports){
+},{"../WorldObjects/Tree":20,"../constants/names":23,"../core/GameObject":28,"lodash":2,"perlin-noise":8}],18:[function(require,module,exports){
 const Building = require('../core/Building')
 const { BUILDING, CONSTRUCTION } = require('../constants/tags')
 
@@ -68018,7 +68026,19 @@ module.exports = class House extends Building {
   }
 }
 
-},{"../constants/tags":23,"../core/Building":25}],18:[function(require,module,exports){
+},{"../constants/tags":25,"../core/Building":27}],19:[function(require,module,exports){
+const GameObject = require('../core/GameObject')
+
+module.exports = class Sun extends GameObject {
+  constructor(args) {
+    super(args)
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
+    scene.add(directionalLight)
+  }
+}
+
+},{"../core/GameObject":28}],20:[function(require,module,exports){
 const GameObject = require('../core/GameObject')
 const { TREE } = require('../constants/tags')
 
@@ -68067,7 +68087,7 @@ module.exports = class Tree extends GameObject {
   }
 }
 
-},{"../constants/tags":23,"../core/GameObject":26}],19:[function(require,module,exports){
+},{"../constants/tags":25,"../core/GameObject":28}],21:[function(require,module,exports){
 const _ = require('lodash')
 const Actor = require('../core/Actor')
 const {
@@ -68196,18 +68216,18 @@ module.exports = class Worker extends Actor {
   }
 }
 
-},{"../constants/actions":20,"../constants/tags":23,"../core/Actor":24,"lodash":2}],20:[function(require,module,exports){
+},{"../constants/actions":22,"../constants/tags":25,"../core/Actor":26,"lodash":2}],22:[function(require,module,exports){
 module.exports = {
   ATTACK: 'ATTACK',
   CHOP_WOOD: 'CHOP_WOOD',
 }
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports = {
   GROUND_NAME: 'GROUND',
 }
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 const MAX_GROUND_HEIGHT = 5
 
 
@@ -68215,14 +68235,14 @@ module.exports = {
   MAX_GROUND_HEIGHT,
 }
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports = {
   TREE: 'TREE',
   BUILDING: 'BUILDING',
   CONSTRUCTION: 'CONSTRUCTION',
 }
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 const _ = require('lodash')
 const GameObject = require('./GameObject')
 const {
@@ -68307,7 +68327,7 @@ module.exports = class Actor extends GameObject {
   attack() {}
 }
 
-},{"../WorldObjects/Worker":19,"../constants/actions":20,"./GameObject":26,"lodash":2}],25:[function(require,module,exports){
+},{"../WorldObjects/Worker":21,"../constants/actions":22,"./GameObject":28,"lodash":2}],27:[function(require,module,exports){
 const GameObject = require('./GameObject')
 
 module.exports = class Building extends GameObject {
@@ -68320,7 +68340,7 @@ module.exports = class Building extends GameObject {
   // update() {}
 }
 
-},{"./GameObject":26}],26:[function(require,module,exports){
+},{"./GameObject":28}],28:[function(require,module,exports){
 
 const raycaster = new THREE.Raycaster()
 
@@ -68373,7 +68393,7 @@ module.exports = class GameObject {
   }
 }
 
-},{"../constants/names":21,"../constants/other":22}],27:[function(require,module,exports){
+},{"../constants/names":23,"../constants/other":24}],29:[function(require,module,exports){
 (function (global){
 global.timeDelta = 16
 
@@ -68423,7 +68443,7 @@ module.exports = {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 (function (global){
 const THREE = require('three')
 
@@ -68469,4 +68489,4 @@ initScene()
 initLoop()
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../MapScene":15,"./loop":27,"three":10,"three/examples/js/QuickHull":11,"three/examples/js/controls/MapControls":12,"three/examples/js/geometries/ConvexGeometry":13,"uniqid":14}]},{},[28]);
+},{"../MapScene":15,"./loop":29,"three":10,"three/examples/js/QuickHull":11,"three/examples/js/controls/MapControls":12,"three/examples/js/geometries/ConvexGeometry":13,"uniqid":14}]},{},[30]);

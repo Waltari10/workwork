@@ -4,22 +4,16 @@ const Worker = require('./WorldObjects/Worker.js')
 const Ground = require('./WorldObjects/Ground.js')
 const Tree = require('./WorldObjects/Tree.js')
 const House = require('./WorldObjects/House.js')
+const Sun = require('./WorldObjects/Sun.js')
+const Camera = require('./WorldObjects/Camera.js')
 
 function createScene() {
-  global.camera = new THREE.PerspectiveCamera(
-    70,
-    window.innerWidth / window.innerHeight,
-    0.0000001,
-  )
-
-
-  const controls = new THREE.MapControls(camera)
-  camera.position.set(0, 0, 2)
-  controls.update()
+  instantiate(Camera)
 
   instantiate(Worker, {
     position: Vector3(2, 0, 0),
   })
+  instantiate(Sun)
 
   instantiate(Ground)
 
