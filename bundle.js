@@ -68004,6 +68004,17 @@ module.exports = class Ground extends GameObject {
     }
   }
 
+  getDistanceToRiverMiddle(riverPath, position) {
+    let shortestDistance = Infinity
+    riverPath.forEach(p => {
+      const distance = p.distanceTo(position)
+      if (distance < shortestDistance) {
+        shortestDistance = distance
+      }
+    })
+    return shortestDistance
+  }
+
   createGround() {
     const options = {
       octaveCount: 4, // 4 defaults
@@ -68023,14 +68034,21 @@ module.exports = class Ground extends GameObject {
 
     let i = 0
 
+    const riverDepth = 2
+    const riverRadius = 2
+
     for (let x = 0; x < actualResolutionX; x++) {
       for (let y = 0; y < actualResolutionY; y++) {
         let h = noise[i]
 
-        for (let o = 0; o < riverPath.length; o++) {
-          if (this.geometryPlane.vertices[i].distanceTo(riverPath[o]) < 1.5) {
-            h = -1
-          }
+        const distanceToRiverMiddle = this.getDistanceToRiverMiddle(riverPath, this.geometryPlane.vertices[i])
+
+        if (distanceToRiverMiddle < riverRadius) {
+          // This should be zero when distanceToRiverMiddle is at highest
+          // This should be riverDepth when distanceToRiverMiddle is at its lowest
+
+          // This is linear, can you make it logarithmic?
+          h -= Math.sin((1 - (distanceToRiverMiddle / riverRadius)) * riverDepth)
         }
 
         this.geometryPlane.vertices[i].z = h
