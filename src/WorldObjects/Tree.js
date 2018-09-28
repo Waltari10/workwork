@@ -5,12 +5,13 @@ const _ = require('lodash')
 module.exports = class Tree extends GameObject {
   constructor(args) {
     super(args)
-
-    this.quantity = 10
-
     this.createMesh()
+
+
     this.tags = [TREE]
     this.isFrozen = true
+
+    this.quantity = this.scale * 10
   }
 
   harvest() {
@@ -23,6 +24,9 @@ module.exports = class Tree extends GameObject {
   }
 
   createMesh() {
+    const maxScale = 1.7
+    const minScale = 0.5
+
     const pivot = new THREE.Object3D()
     pivot.position.x = this.position.x
     pivot.position.y = this.position.y
@@ -44,7 +48,10 @@ module.exports = class Tree extends GameObject {
     pivot.add(cylinder)
 
 
-    const scale = _.random(0.5, 1.7, true)
+    const scale = _.random(minScale, maxScale, true)
+    this.scale.x = scale
+    this.scale.y = scale
+    this.scale.z = scale
     pivot.scale.x = scale
     pivot.scale.y = scale
     pivot.scale.z = scale * _.random(0.8, 1.2, true)
