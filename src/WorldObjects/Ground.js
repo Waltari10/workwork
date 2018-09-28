@@ -15,12 +15,115 @@ module.exports = class Ground extends GameObject {
     this.sizeY = 20
 
     this.createGround()
-    this.addTrees()
+    // this.addTrees()
     this.addWater()
+    this.addRiver()
     this.isFrozen = true
   }
 
   addWater() {}
+
+  addRiver() {
+    const options = {
+      octaveCount: 4, // 4 defaults
+      amplitude: 0.1, // 0.1
+      persistence: 0.2, // 0.2
+    }
+    const resolution = 100
+    const curvature = 3
+    const noise = perlin.generatePerlinNoise(resolution, 1, options)
+
+    const material = new THREE.LineBasicMaterial({
+      color: 'blue',
+    })
+
+    const geometry = new THREE.Geometry()
+
+    function onMap(position) {
+      // Raycast down and if ground not found, end loop
+
+      const origin = new THREE.Vector3(position.x, position.y, 5)
+      let direction = new THREE.Vector3(0, 0, -1)
+      direction = direction.normalize()
+
+      raycaster.set(origin, direction)
+
+      const intersects = raycaster.intersectObjects(scene.children)
+
+      if (intersects.length > 0) {
+        const groundIntersection = intersects.find(obj => {
+          if (obj.object.name === GROUND_NAME) {
+            return true
+          }
+          return false
+        })
+        if (groundIntersection) {
+          return true
+        }
+      }
+      return false
+    }
+
+    let position = Vector3(
+      -this.sizeX / 2,
+      Math.random(-this.sizeY / 2, this.sizeY / 2), // TODO: Is this random enough?
+      1,
+    )
+
+
+    const material2 = new THREE.MeshNormalMaterial()
+    const geometry2 = new THREE.CylinderGeometry(1, 1, 1, 16)
+    const cylinderMesh = new THREE.Mesh(geometry2, material2)
+    cylinderMesh.position.x = position.x
+    cylinderMesh.position.y = position.y
+    cylinderMesh.position.z = position.z
+    scene.add(cylinderMesh)
+
+
+    const hopDistance = 0.5
+    let direction = 0
+
+    let i = 0
+
+
+    while (i < 100 && onMap(position)) {
+      geometry.vertices.push(
+        position,
+      )
+      // Start from the middle of maps side
+      // Start perpendicular, and then modify direction by perlin noise
+
+      direction = (noise[i] - 0.5) * curvature
+
+      // direction is angle
+      // hopDistance is hypotenuse
+
+      const posXChange = Math.cos(direction) * hopDistance
+      const posYChange = Math.sin(direction) * hopDistance
+
+      position = Vector3(position.x + posXChange, position.y + posYChange, 1)
+
+      i++
+    }
+
+    // for (let i = 0; i < resolution; i++) {
+    //   // posX max value is 20.
+    //   // create a linear river that ripples back and forth on y axis.
+    //   // Scale x using i to values between 0 and 20
+    //   const posX = ((i / resolution) * this.sizeX) - (this.sizeX / 2)
+    //   const posY = noise[i]
+
+    //   console.log(posX)
+    //   console.log(posY)
+
+    //   geometry.vertices.push(
+    //     new THREE.Vector3(posX, posY, 1),
+    //   )
+    // }
+
+    const line = new THREE.Line(geometry, material)
+    scene.add(line)
+  }
 
   addTrees() {
     const options = {
