@@ -8,13 +8,14 @@ const _ = require('lodash')
 
 module.exports = class GameObject {
   constructor({
-    position = new THREE.Vector3(),
+    position = Vector3(),
     tags = [],
     mesh,
     HP = 1,
     rotation,
     isGrounded = true,
     isFrozen = false,
+    scale = Vector3(),
   } = {}) {
     this.rotation = rotation
     this.position = position
@@ -23,6 +24,7 @@ module.exports = class GameObject {
     this.HP = HP
     this.isGrounded = isGrounded
     this.isFrozen = isFrozen
+    this.scale = scale
   }
 
   snapToGround() {

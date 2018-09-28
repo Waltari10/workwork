@@ -43,6 +43,11 @@ module.exports = class Tree extends GameObject {
     cylinder.rotation.x = Math.PI * 0.5
     pivot.add(cylinder)
 
+
+    const scale = _.random(0.5, 1.7, true)
+    pivot.scale.x = scale
+    pivot.scale.y = scale
+    pivot.scale.z = scale * _.random(0.8, 1.2, true)
     pivot.rotation.x += _.random(-Math.PI / 18, Math.PI / 18, true)
     pivot.rotation.y += _.random(-Math.PI / 18, Math.PI / 18, true)
     pivot.rotation.z = _.random(Math.PI * 2, true)

@@ -2,7 +2,6 @@
 
 const Worker = require('./WorldObjects/Worker.js')
 const Ground = require('./WorldObjects/Ground.js')
-const Tree = require('./WorldObjects/Tree.js')
 const House = require('./WorldObjects/House.js')
 const Sun = require('./WorldObjects/Sun.js')
 const Camera = require('./WorldObjects/Camera.js')
