@@ -67811,7 +67811,6 @@ function macHandler(error){
 
 const Worker = require('./WorldObjects/Worker.js')
 const Ground = require('./WorldObjects/Ground.js')
-const Tree = require('./WorldObjects/Tree.js')
 const House = require('./WorldObjects/House.js')
 const Sun = require('./WorldObjects/Sun.js')
 const Camera = require('./WorldObjects/Camera.js')
@@ -67835,7 +67834,7 @@ module.exports = {
   createScene,
 }
 
-},{"./WorldObjects/Camera.js":16,"./WorldObjects/Ground.js":17,"./WorldObjects/House.js":18,"./WorldObjects/Sun.js":19,"./WorldObjects/Tree.js":20,"./WorldObjects/Worker.js":21}],16:[function(require,module,exports){
+},{"./WorldObjects/Camera.js":16,"./WorldObjects/Ground.js":17,"./WorldObjects/House.js":18,"./WorldObjects/Sun.js":19,"./WorldObjects/Worker.js":21}],16:[function(require,module,exports){
 (function (global){
 
 const GameObject = require('../core/GameObject')
@@ -68046,12 +68045,13 @@ const _ = require('lodash')
 module.exports = class Tree extends GameObject {
   constructor(args) {
     super(args)
-
-    this.quantity = 10
-
     this.createMesh()
+
+
     this.tags = [TREE]
     this.isFrozen = true
+
+    this.quantity = this.scale * 10
   }
 
   harvest() {
@@ -68064,6 +68064,9 @@ module.exports = class Tree extends GameObject {
   }
 
   createMesh() {
+    const maxScale = 1.7
+    const minScale = 0.5
+
     const pivot = new THREE.Object3D()
     pivot.position.x = this.position.x
     pivot.position.y = this.position.y
@@ -68084,6 +68087,14 @@ module.exports = class Tree extends GameObject {
     cylinder.rotation.x = Math.PI * 0.5
     pivot.add(cylinder)
 
+
+    const scale = _.random(minScale, maxScale, true)
+    this.scale.x = scale
+    this.scale.y = scale
+    this.scale.z = scale
+    pivot.scale.x = scale
+    pivot.scale.y = scale
+    pivot.scale.z = scale * _.random(0.8, 1.2, true)
     pivot.rotation.x += _.random(-Math.PI / 18, Math.PI / 18, true)
     pivot.rotation.y += _.random(-Math.PI / 18, Math.PI / 18, true)
     pivot.rotation.z = _.random(Math.PI * 2, true)
@@ -68117,24 +68128,37 @@ module.exports = class Worker extends Actor {
   constructor(args) {
     super(args)
 
+    const pivot = new THREE.Object3D()
+
+    const height = 0.2
+    const radius = 0.05
+    const segments = 8
+
 
     this.update = this.update.bind(this)
     this.findJob = this.findJob.bind(this)
     this.findTree = this.findTree.bind(this)
 
     const material = new THREE.MeshNormalMaterial()
-    const geometry = new THREE.SphereGeometry(0.1, 4, 4)
-    this.mesh = new THREE.Mesh(geometry, material)
+    const geometry = new THREE.CylinderGeometry(radius, radius, height, segments)
+    const cylinderMesh = new THREE.Mesh(geometry, material)
 
-    this.mesh.position.x = args.position.x
-    this.mesh.position.z = args.position.z
-    this.mesh.position.y = args.position.y
+    cylinderMesh.position.z = height / 2
+    pivot.position.x = args.position.x
+    pivot.position.z = args.position.z
+    pivot.position.y = args.position.y
 
-    scene.add(this.mesh)
+    cylinderMesh.rotation.x = Math.PI * 0.5
+
+    pivot.add(cylinderMesh)
+
+    this.mesh = pivot
 
     this.setState(AI_STATES.IDLE)
 
     this.tag = 'WORKER'
+
+    scene.add(pivot)
   }
 
   findJob() {
@@ -68357,13 +68381,14 @@ const _ = require('lodash')
 
 module.exports = class GameObject {
   constructor({
-    position = new THREE.Vector3(),
+    position = Vector3(),
     tags = [],
     mesh,
     HP = 1,
     rotation,
     isGrounded = true,
     isFrozen = false,
+    scale = Vector3(),
   } = {}) {
     this.rotation = rotation
     this.position = position
@@ -68372,6 +68397,7 @@ module.exports = class GameObject {
     this.HP = HP
     this.isGrounded = isGrounded
     this.isFrozen = isFrozen
+    this.scale = scale
   }
 
   snapToGround() {

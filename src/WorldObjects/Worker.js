@@ -21,24 +21,37 @@ module.exports = class Worker extends Actor {
   constructor(args) {
     super(args)
 
+    const pivot = new THREE.Object3D()
+
+    const height = 0.2
+    const radius = 0.05
+    const segments = 8
+
 
     this.update = this.update.bind(this)
     this.findJob = this.findJob.bind(this)
     this.findTree = this.findTree.bind(this)
 
     const material = new THREE.MeshNormalMaterial()
-    const geometry = new THREE.SphereGeometry(0.1, 4, 4)
-    this.mesh = new THREE.Mesh(geometry, material)
+    const geometry = new THREE.CylinderGeometry(radius, radius, height, segments)
+    const cylinderMesh = new THREE.Mesh(geometry, material)
 
-    this.mesh.position.x = args.position.x
-    this.mesh.position.z = args.position.z
-    this.mesh.position.y = args.position.y
+    cylinderMesh.position.z = height / 2
+    pivot.position.x = args.position.x
+    pivot.position.z = args.position.z
+    pivot.position.y = args.position.y
 
-    scene.add(this.mesh)
+    cylinderMesh.rotation.x = Math.PI * 0.5
+
+    pivot.add(cylinderMesh)
+
+    this.mesh = pivot
 
     this.setState(AI_STATES.IDLE)
 
     this.tag = 'WORKER'
+
+    scene.add(pivot)
   }
 
   findJob() {
