@@ -5,7 +5,7 @@ const Tree = require('../WorldObjects/Tree')
 
 const raycaster = new THREE.Raycaster()
 
-const { GROUND_NAME } = require('../constants/names')
+const { GROUND_NAME, WATER_NAME } = require('../constants/names')
 
 module.exports = class Ground extends GameObject {
   constructor(args) {
@@ -15,8 +15,8 @@ module.exports = class Ground extends GameObject {
     this.sizeY = 20
 
     this.createGround()
-    this.addTrees()
     this.addWater()
+    this.addTrees()
     this.isFrozen = true
   }
 
@@ -26,6 +26,7 @@ module.exports = class Ground extends GameObject {
     material.wireframe = true
     const plane = new THREE.Mesh(geometry, material)
     plane.position.y = 0.5
+    plane.name = WATER_NAME
     scene.add(plane)
   }
 
@@ -120,6 +121,7 @@ module.exports = class Ground extends GameObject {
         const intersects = raycaster.intersectObjects(scene.children)
 
         let positionZ
+        let isOnWater = false
         if (intersects.length > 0) {
           const groundIntersection = intersects.find(obj => {
             if (obj.object.name === GROUND_NAME) {
@@ -128,9 +130,16 @@ module.exports = class Ground extends GameObject {
             return false
           })
           positionZ = groundIntersection.point.z
-        }
 
-        if (h > 0.5 && !_.isNil(positionZ) && positionZ !== -1) {
+          isOnWater = intersects[0].object.name === WATER_NAME
+
+        }
+        if (
+          h > 0.5 &&
+          !_.isNil(positionZ) &&
+          positionZ !== -1 &&
+          !isOnWater
+        ) {
           instantiate(Tree, {
             position: Vector3(
               positionX,
