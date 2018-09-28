@@ -2,8 +2,7 @@ const THREE = require('three')
 
 window.THREE = THREE
 // Adds orbitcontrols to global Threes object
-require('three/examples/js/controls/MapControls')
-require('three/examples/js/geometries/ConvexGeometry')
+// require('three/src/helpers/FaceNormalsHelper')
 require('three/examples/js/QuickHull')
 const uniqid = require('uniqid')
 const { initLoop } = require('./loop')

@@ -67683,89 +67683,6 @@ Object.defineProperties( THREE.MapControls.prototype, {
 } );
 
 },{}],13:[function(require,module,exports){
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
-( function () {
-
-	// ConvexGeometry
-
-	function ConvexGeometry( points ) {
-
-		THREE.Geometry.call( this );
-
-		this.fromBufferGeometry( new ConvexBufferGeometry( points ) );
-		this.mergeVertices();
-
-	}
-
-	ConvexGeometry.prototype = Object.create( THREE.Geometry.prototype );
-	ConvexGeometry.prototype.constructor = ConvexGeometry;
-
-	// ConvexBufferGeometry
-
-	function ConvexBufferGeometry( points ) {
-
-		THREE.BufferGeometry.call( this );
-
-		// buffers
-
-		var vertices = [];
-		var normals = [];
-
-		// execute QuickHull
-
-		if ( THREE.QuickHull === undefined ) {
-
-			console.error( 'THREE.ConvexBufferGeometry: ConvexBufferGeometry relies on THREE.QuickHull' );
-
-		}
-
-		var quickHull = new THREE.QuickHull().setFromPoints( points );
-
-		// generate vertices and normals
-
-		var faces = quickHull.faces;
-
-		for ( var i = 0; i < faces.length; i ++ ) {
-
-			var face = faces[ i ];
-			var edge = face.edge;
-
-			// we move along a doubly-connected edge list to access all face points (see HalfEdge docs)
-
-			do {
-
-				var point = edge.head().point;
-
-				vertices.push( point.x, point.y, point.z );
-				normals.push( face.normal.x, face.normal.y, face.normal.z );
-
-				edge = edge.next;
-
-			} while ( edge !== face.edge );
-
-		}
-
-		// build geometry
-
-		this.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-		this.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-
-	}
-
-	ConvexBufferGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
-	ConvexBufferGeometry.prototype.constructor = ConvexBufferGeometry;
-
-	// export
-
-	THREE.ConvexGeometry = ConvexGeometry;
-	THREE.ConvexBufferGeometry = ConvexBufferGeometry;
-
-} )();
-
-},{}],14:[function(require,module,exports){
 (function (process){
 /* 
 (The MIT License)
@@ -67806,7 +67723,7 @@ function macHandler(error){
 }
 
 }).call(this,require('_process'))
-},{"_process":9,"macaddress":3}],15:[function(require,module,exports){
+},{"_process":9,"macaddress":3}],14:[function(require,module,exports){
 // const _ = require('lodash')
 
 const Worker = require('./WorldObjects/Worker.js')
@@ -67834,10 +67751,11 @@ module.exports = {
   createScene,
 }
 
-},{"./WorldObjects/Camera.js":16,"./WorldObjects/Ground.js":17,"./WorldObjects/House.js":18,"./WorldObjects/Sun.js":19,"./WorldObjects/Worker.js":21}],16:[function(require,module,exports){
+},{"./WorldObjects/Camera.js":15,"./WorldObjects/Ground.js":16,"./WorldObjects/House.js":17,"./WorldObjects/Sun.js":18,"./WorldObjects/Worker.js":20}],15:[function(require,module,exports){
 (function (global){
 
 const GameObject = require('../core/GameObject')
+require('three/examples/js/controls/MapControls')
 
 module.exports = class Sun extends GameObject {
   constructor(args) {
@@ -67856,7 +67774,7 @@ module.exports = class Sun extends GameObject {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../core/GameObject":28}],17:[function(require,module,exports){
+},{"../core/GameObject":27,"three/examples/js/controls/MapControls":12}],16:[function(require,module,exports){
 const _ = require('lodash')
 const perlin = require('perlin-noise')
 const GameObject = require('../core/GameObject')
@@ -67881,12 +67799,12 @@ module.exports = class Ground extends GameObject {
 
   addWater() {
     const geometry = new THREE.PlaneGeometry(this.sizeX, this.sizeY)
-    const material = new THREE.MeshBasicMaterial({ color: 'blue', side: THREE.DoubleSide })
+    const material = new THREE.MeshLambertMaterial({ color: 'blue', emissive: 'blue', side: THREE.DoubleSide })
     material.wireframe = true
     const plane = new THREE.Mesh(geometry, material)
     plane.position.y = 0.5
     plane.name = WATER_NAME
-    scene.add(plane)
+    // scene.add(plane)
   }
 
   onMap(position) {
@@ -67988,10 +67906,12 @@ module.exports = class Ground extends GameObject {
             }
             return false
           })
-          positionZ = groundIntersection.point.z
+
+          if (groundIntersection) {
+            positionZ = groundIntersection.point.z
+          }
 
           isOnWater = intersects[0].object.name === WATER_NAME
-
         }
         if (
           h > 0.5 &&
@@ -68036,7 +67956,8 @@ module.exports = class Ground extends GameObject {
     const actualResolutionX = resolutionX + 1 // plane adds one vertex
     const actualResolutionY = resolutionY + 1
 
-    this.geometryPlane = new THREE.PlaneGeometry(this.sizeX, this.sizeY, resolutionX, resolutionY)
+
+    const geometryPlane = new THREE.PlaneGeometry(this.sizeX, this.sizeY, resolutionX, resolutionY)
 
     const noise = perlin.generatePerlinNoise(actualResolutionX, actualResolutionY, options)
     const riverPath = this.createRiverPath()
@@ -68050,7 +67971,7 @@ module.exports = class Ground extends GameObject {
       for (let y = 0; y < actualResolutionY; y++) {
         let h = noise[i]
 
-        const distanceToRiverMiddle = this.getDistanceToRiverMiddle(riverPath, this.geometryPlane.vertices[i])
+        const distanceToRiverMiddle = this.getDistanceToRiverMiddle(riverPath, geometryPlane.vertices[i])
 
         if (distanceToRiverMiddle < riverRadius) {
           // This should be zero when distanceToRiverMiddle is at highest
@@ -68060,24 +67981,30 @@ module.exports = class Ground extends GameObject {
           h -= Math.sin((1 - (distanceToRiverMiddle / riverRadius)) * riverDepth)
         }
 
-        this.geometryPlane.vertices[i].z = h
+        geometryPlane.vertices[i].z = h
         i++
       }
     }
 
-    this.geometryPlane.verticesNeedUpdate = true
-    this.geometryPlane.computeFaceNormals()
+    geometryPlane.verticesNeedUpdate = true
+    geometryPlane.computeFaceNormals()
 
-    const materialPlane = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.FrontSide })
-    materialPlane.wireframe = true
+    const materialPlane = new THREE.MeshLambertMaterial({
+      color: 0xffff00,
+      side: THREE.FrontSide,
+      emissive: 'green',
+    })
 
-    const ground = new THREE.Mesh(this.geometryPlane, materialPlane)
+    const ground = new THREE.Mesh(geometryPlane, materialPlane)
+    const helper = new THREE.FaceNormalsHelper(ground, 2, 0x00ff00, 1)
+    geometryPlane.computeVertexNormals()
     ground.name = GROUND_NAME
+    scene.add(helper)
     scene.add(ground)
   }
 }
 
-},{"../WorldObjects/Tree":20,"../constants/names":23,"../core/GameObject":28,"lodash":2,"perlin-noise":8}],18:[function(require,module,exports){
+},{"../WorldObjects/Tree":19,"../constants/names":22,"../core/GameObject":27,"lodash":2,"perlin-noise":8}],17:[function(require,module,exports){
 const Building = require('../core/Building')
 const { BUILDING, CONSTRUCTION } = require('../constants/tags')
 
@@ -68118,7 +68045,7 @@ module.exports = class House extends Building {
   }
 }
 
-},{"../constants/tags":25,"../core/Building":27}],19:[function(require,module,exports){
+},{"../constants/tags":24,"../core/Building":26}],18:[function(require,module,exports){
 const GameObject = require('../core/GameObject')
 
 module.exports = class Sun extends GameObject {
@@ -68130,7 +68057,7 @@ module.exports = class Sun extends GameObject {
   }
 }
 
-},{"../core/GameObject":28}],20:[function(require,module,exports){
+},{"../core/GameObject":27}],19:[function(require,module,exports){
 const GameObject = require('../core/GameObject')
 const { TREE } = require('../constants/tags')
 const _ = require('lodash')
@@ -68164,21 +68091,21 @@ module.exports = class Tree extends GameObject {
     pivot.position.x = this.position.x
     pivot.position.y = this.position.y
     pivot.position.z = this.position.z
-    const pine = new THREE.MeshBasicMaterial({ color: '#2d9e44' })
-    const trunk = new THREE.MeshBasicMaterial({ color: '#1e4726' })
+    const pineMaterial = new THREE.MeshLambertMaterial({ color: '#2d9e44' })
 
     const coneGeometry = new THREE.ConeGeometry(0.3, 0.9, 16)
-    const cone = new THREE.Mesh(coneGeometry, pine)
+    const cone = new THREE.Mesh(coneGeometry, pineMaterial)
     cone.rotation.x = Math.PI * 0.5
     cone.position.z = 0.48
     pivot.add(cone)
 
 
-    const cylinderGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.03, 8)
-    const cylinder = new THREE.Mesh(cylinderGeometry, trunk)
-    cylinder.position.z = 0.015
-    cylinder.rotation.x = Math.PI * 0.5
-    pivot.add(cylinder)
+    const trunkMaterial = new THREE.MeshLambertMaterial({ color: '#1e4726' })
+    const trunkGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.03, 8)
+    const trunkMesh = new THREE.Mesh(trunkGeometry, trunkMaterial)
+    trunkMesh.position.z = 0.015
+    trunkMesh.rotation.x = Math.PI * 0.5
+    pivot.add(trunkMesh)
 
 
     const scale = _.random(minScale, maxScale, true)
@@ -68197,7 +68124,7 @@ module.exports = class Tree extends GameObject {
   }
 }
 
-},{"../constants/tags":25,"../core/GameObject":28,"lodash":2}],21:[function(require,module,exports){
+},{"../constants/tags":24,"../core/GameObject":27,"lodash":2}],20:[function(require,module,exports){
 const _ = require('lodash')
 const Actor = require('../core/Actor')
 const {
@@ -68339,19 +68266,19 @@ module.exports = class Worker extends Actor {
   }
 }
 
-},{"../constants/actions":22,"../constants/tags":25,"../core/Actor":26,"lodash":2}],22:[function(require,module,exports){
+},{"../constants/actions":21,"../constants/tags":24,"../core/Actor":25,"lodash":2}],21:[function(require,module,exports){
 module.exports = {
   ATTACK: 'ATTACK',
   CHOP_WOOD: 'CHOP_WOOD',
 }
 
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports = {
   GROUND_NAME: 'GROUND',
   WATER_NAME: 'WATER',
 }
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 const MAX_GROUND_HEIGHT = 5
 
 
@@ -68359,21 +68286,20 @@ module.exports = {
   MAX_GROUND_HEIGHT,
 }
 
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = {
   TREE: 'TREE',
   BUILDING: 'BUILDING',
   CONSTRUCTION: 'CONSTRUCTION',
 }
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 const _ = require('lodash')
 const GameObject = require('./GameObject')
 const {
   ATTACK,
   CHOP_WOOD,
 } = require('../constants/actions')
-const Worker = require('../WorldObjects/Worker')
 
 
 module.exports = class Actor extends GameObject {
@@ -68451,7 +68377,7 @@ module.exports = class Actor extends GameObject {
   attack() {}
 }
 
-},{"../WorldObjects/Worker":21,"../constants/actions":22,"./GameObject":28,"lodash":2}],27:[function(require,module,exports){
+},{"../constants/actions":21,"./GameObject":27,"lodash":2}],26:[function(require,module,exports){
 const GameObject = require('./GameObject')
 
 module.exports = class Building extends GameObject {
@@ -68464,7 +68390,7 @@ module.exports = class Building extends GameObject {
   // update() {}
 }
 
-},{"./GameObject":28}],28:[function(require,module,exports){
+},{"./GameObject":27}],27:[function(require,module,exports){
 
 const raycaster = new THREE.Raycaster()
 
@@ -68525,7 +68451,7 @@ module.exports = class GameObject {
   }
 }
 
-},{"../constants/names":23,"../constants/other":24,"lodash":2}],29:[function(require,module,exports){
+},{"../constants/names":22,"../constants/other":23,"lodash":2}],28:[function(require,module,exports){
 (function (global){
 global.timeDelta = 16
 
@@ -68575,14 +68501,13 @@ module.exports = {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 (function (global){
 const THREE = require('three')
 
 window.THREE = THREE
 // Adds orbitcontrols to global Threes object
-require('three/examples/js/controls/MapControls')
-require('three/examples/js/geometries/ConvexGeometry')
+// require('three/src/helpers/FaceNormalsHelper')
 require('three/examples/js/QuickHull')
 const uniqid = require('uniqid')
 const { initLoop } = require('./loop')
@@ -68621,4 +68546,4 @@ initScene()
 initLoop()
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../MapScene":15,"./loop":29,"three":10,"three/examples/js/QuickHull":11,"three/examples/js/controls/MapControls":12,"three/examples/js/geometries/ConvexGeometry":13,"uniqid":14}]},{},[30]);
+},{"../MapScene":14,"./loop":28,"three":10,"three/examples/js/QuickHull":11,"uniqid":13}]},{},[29]);

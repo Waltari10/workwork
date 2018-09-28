@@ -1,5 +1,6 @@
 
 const GameObject = require('../core/GameObject')
+require('three/examples/js/controls/MapControls')
 
 module.exports = class Sun extends GameObject {
   constructor(args) {

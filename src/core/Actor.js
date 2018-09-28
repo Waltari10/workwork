@@ -4,7 +4,6 @@ const {
   ATTACK,
   CHOP_WOOD,
 } = require('../constants/actions')
-const Worker = require('../WorldObjects/Worker')
 
 
 module.exports = class Actor extends GameObject {

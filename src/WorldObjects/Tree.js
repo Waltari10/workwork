@@ -31,21 +31,21 @@ module.exports = class Tree extends GameObject {
     pivot.position.x = this.position.x
     pivot.position.y = this.position.y
     pivot.position.z = this.position.z
-    const pine = new THREE.MeshBasicMaterial({ color: '#2d9e44' })
-    const trunk = new THREE.MeshBasicMaterial({ color: '#1e4726' })
+    const pineMaterial = new THREE.MeshLambertMaterial({ color: '#2d9e44' })
 
     const coneGeometry = new THREE.ConeGeometry(0.3, 0.9, 16)
-    const cone = new THREE.Mesh(coneGeometry, pine)
+    const cone = new THREE.Mesh(coneGeometry, pineMaterial)
     cone.rotation.x = Math.PI * 0.5
     cone.position.z = 0.48
     pivot.add(cone)
 
 
-    const cylinderGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.03, 8)
-    const cylinder = new THREE.Mesh(cylinderGeometry, trunk)
-    cylinder.position.z = 0.015
-    cylinder.rotation.x = Math.PI * 0.5
-    pivot.add(cylinder)
+    const trunkMaterial = new THREE.MeshLambertMaterial({ color: '#1e4726' })
+    const trunkGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.03, 8)
+    const trunkMesh = new THREE.Mesh(trunkGeometry, trunkMaterial)
+    trunkMesh.position.z = 0.015
+    trunkMesh.rotation.x = Math.PI * 0.5
+    pivot.add(trunkMesh)
 
 
     const scale = _.random(minScale, maxScale, true)

@@ -22,12 +22,12 @@ module.exports = class Ground extends GameObject {
 
   addWater() {
     const geometry = new THREE.PlaneGeometry(this.sizeX, this.sizeY)
-    const material = new THREE.MeshBasicMaterial({ color: 'blue', side: THREE.DoubleSide })
+    const material = new THREE.MeshLambertMaterial({ color: 'blue', emissive: 'blue', side: THREE.DoubleSide })
     material.wireframe = true
     const plane = new THREE.Mesh(geometry, material)
     plane.position.y = 0.5
     plane.name = WATER_NAME
-    scene.add(plane)
+    // scene.add(plane)
   }
 
   onMap(position) {
@@ -129,10 +129,12 @@ module.exports = class Ground extends GameObject {
             }
             return false
           })
-          positionZ = groundIntersection.point.z
+
+          if (groundIntersection) {
+            positionZ = groundIntersection.point.z
+          }
 
           isOnWater = intersects[0].object.name === WATER_NAME
-
         }
         if (
           h > 0.5 &&
@@ -177,7 +179,8 @@ module.exports = class Ground extends GameObject {
     const actualResolutionX = resolutionX + 1 // plane adds one vertex
     const actualResolutionY = resolutionY + 1
 
-    this.geometryPlane = new THREE.PlaneGeometry(this.sizeX, this.sizeY, resolutionX, resolutionY)
+
+    const geometryPlane = new THREE.PlaneGeometry(this.sizeX, this.sizeY, resolutionX, resolutionY)
 
     const noise = perlin.generatePerlinNoise(actualResolutionX, actualResolutionY, options)
     const riverPath = this.createRiverPath()
@@ -191,7 +194,7 @@ module.exports = class Ground extends GameObject {
       for (let y = 0; y < actualResolutionY; y++) {
         let h = noise[i]
 
-        const distanceToRiverMiddle = this.getDistanceToRiverMiddle(riverPath, this.geometryPlane.vertices[i])
+        const distanceToRiverMiddle = this.getDistanceToRiverMiddle(riverPath, geometryPlane.vertices[i])
 
         if (distanceToRiverMiddle < riverRadius) {
           // This should be zero when distanceToRiverMiddle is at highest
@@ -201,19 +204,25 @@ module.exports = class Ground extends GameObject {
           h -= Math.sin((1 - (distanceToRiverMiddle / riverRadius)) * riverDepth)
         }
 
-        this.geometryPlane.vertices[i].z = h
+        geometryPlane.vertices[i].z = h
         i++
       }
     }
 
-    this.geometryPlane.verticesNeedUpdate = true
-    this.geometryPlane.computeFaceNormals()
+    geometryPlane.verticesNeedUpdate = true
+    geometryPlane.computeFaceNormals()
 
-    const materialPlane = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.FrontSide })
-    materialPlane.wireframe = true
+    const materialPlane = new THREE.MeshLambertMaterial({
+      color: 0xffff00,
+      side: THREE.FrontSide,
+      emissive: 'green',
+    })
 
-    const ground = new THREE.Mesh(this.geometryPlane, materialPlane)
+    const ground = new THREE.Mesh(geometryPlane, materialPlane)
+    const helper = new THREE.FaceNormalsHelper(ground, 2, 0x00ff00, 1)
+    geometryPlane.computeVertexNormals()
     ground.name = GROUND_NAME
+    scene.add(helper)
     scene.add(ground)
   }
 }
