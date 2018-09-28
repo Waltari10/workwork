@@ -67882,6 +67882,13 @@ module.exports = class Ground extends GameObject {
 
   addWater() {}
 
+  onMap(position) {
+    return position.x >= -this.sizeX / 2 &&
+        position.x <= this.sizeX / 2 &&
+        position.y >= -this.sizeY / 2 &&
+        position.y <= this.sizeY / 2
+  }
+
   addRiver() {
     const options = {
       octaveCount: 4, // 4 defaults
@@ -67898,30 +67905,6 @@ module.exports = class Ground extends GameObject {
 
     const geometry = new THREE.Geometry()
 
-    function onMap(position) {
-      // Raycast down and if ground not found, end loop
-
-      const origin = new THREE.Vector3(position.x, position.y, 5)
-      let direction = new THREE.Vector3(0, 0, -1)
-      direction = direction.normalize()
-
-      raycaster.set(origin, direction)
-
-      const intersects = raycaster.intersectObjects(scene.children)
-
-      if (intersects.length > 0) {
-        const groundIntersection = intersects.find(obj => {
-          if (obj.object.name === GROUND_NAME) {
-            return true
-          }
-          return false
-        })
-        if (groundIntersection) {
-          return true
-        }
-      }
-      return false
-    }
 
     let position = Vector3(
       -this.sizeX / 2,
@@ -67945,7 +67928,7 @@ module.exports = class Ground extends GameObject {
     let i = 0
 
 
-    while (i < 100 && onMap(position)) {
+    while (i < 100 && this.onMap(position)) {
       geometry.vertices.push(
         position,
       )
@@ -67964,21 +67947,6 @@ module.exports = class Ground extends GameObject {
 
       i++
     }
-
-    // for (let i = 0; i < resolution; i++) {
-    //   // posX max value is 20.
-    //   // create a linear river that ripples back and forth on y axis.
-    //   // Scale x using i to values between 0 and 20
-    //   const posX = ((i / resolution) * this.sizeX) - (this.sizeX / 2)
-    //   const posY = noise[i]
-
-    //   console.log(posX)
-    //   console.log(posY)
-
-    //   geometry.vertices.push(
-    //     new THREE.Vector3(posX, posY, 1),
-    //   )
-    // }
 
     const line = new THREE.Line(geometry, material)
     scene.add(line)
