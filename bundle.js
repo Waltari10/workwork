@@ -67874,13 +67874,19 @@ module.exports = class Ground extends GameObject {
     this.sizeY = 20
 
     this.createGround()
-    // this.addTrees()
+    this.addTrees()
     this.addWater()
-    this.addRiver()
     this.isFrozen = true
   }
 
-  addWater() {}
+  addWater() {
+    const geometry = new THREE.PlaneGeometry(this.sizeX, this.sizeY)
+    const material = new THREE.MeshBasicMaterial({ color: 'blue', side: THREE.DoubleSide })
+    material.wireframe = true
+    const plane = new THREE.Mesh(geometry, material)
+    plane.position.y = 0.5
+    scene.add(plane)
+  }
 
   onMap(position) {
     return position.x >= -this.sizeX / 2 &&
@@ -67889,7 +67895,7 @@ module.exports = class Ground extends GameObject {
         position.y <= this.sizeY / 2
   }
 
-  addRiver() {
+  createRiverPath() {
     const options = {
       octaveCount: 4, // 4 defaults
       amplitude: 0.1, // 0.1
@@ -67899,37 +67905,22 @@ module.exports = class Ground extends GameObject {
     const curvature = 3
     const noise = perlin.generatePerlinNoise(resolution, 1, options)
 
-    const material = new THREE.LineBasicMaterial({
-      color: 'blue',
-    })
-
-    const geometry = new THREE.Geometry()
-
-
     let position = Vector3(
       -this.sizeX / 2,
       Math.random(-this.sizeY / 2, this.sizeY / 2), // TODO: Is this random enough?
-      1,
+      0,
     )
-
-
-    const material2 = new THREE.MeshNormalMaterial()
-    const geometry2 = new THREE.CylinderGeometry(1, 1, 1, 16)
-    const cylinderMesh = new THREE.Mesh(geometry2, material2)
-    cylinderMesh.position.x = position.x
-    cylinderMesh.position.y = position.y
-    cylinderMesh.position.z = position.z
-    scene.add(cylinderMesh)
-
 
     const hopDistance = 0.5
     let direction = 0
 
     let i = 0
 
+    const path = []
+
 
     while (i < 100 && this.onMap(position)) {
-      geometry.vertices.push(
+      path.push(
         position,
       )
       // Start from the middle of maps side
@@ -67943,13 +67934,12 @@ module.exports = class Ground extends GameObject {
       const posXChange = Math.cos(direction) * hopDistance
       const posYChange = Math.sin(direction) * hopDistance
 
-      position = Vector3(position.x + posXChange, position.y + posYChange, 1)
+      position = Vector3(position.x + posXChange, position.y + posYChange, 0)
 
       i++
     }
 
-    const line = new THREE.Line(geometry, material)
-    scene.add(line)
+    return path
   }
 
   addTrees() {
@@ -67999,15 +67989,12 @@ module.exports = class Ground extends GameObject {
           positionZ = groundIntersection.point.z
         }
 
-        if (h > 0.5 && !_.isNil(positionZ)) {
+        if (h > 0.5 && !_.isNil(positionZ) && positionZ !== -1) {
           instantiate(Tree, {
             position: Vector3(
               positionX,
               positionY,
-              positionZ, // TODO
-            ),
-            rotation: Vector3(
-
+              positionZ,
             ),
           })
         }
@@ -68032,11 +68019,19 @@ module.exports = class Ground extends GameObject {
     this.geometryPlane = new THREE.PlaneGeometry(this.sizeX, this.sizeY, resolutionX, resolutionY)
 
     const noise = perlin.generatePerlinNoise(actualResolutionX, actualResolutionY, options)
+    const riverPath = this.createRiverPath()
 
     let i = 0
+
     for (let x = 0; x < actualResolutionX; x++) {
       for (let y = 0; y < actualResolutionY; y++) {
-        const h = noise[i]
+        let h = noise[i]
+
+        for (let o = 0; o < riverPath.length; o++) {
+          if (this.geometryPlane.vertices[i].distanceTo(riverPath[o]) < 1.5) {
+            h = -1
+          }
+        }
 
         this.geometryPlane.vertices[i].z = h
         i++
