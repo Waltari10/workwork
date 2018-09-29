@@ -22,7 +22,7 @@ module.exports = class Ground extends GameObject {
 
   addWater() {
     const geometry = new THREE.PlaneGeometry(this.sizeX, this.sizeY)
-    const material = new THREE.MeshLambertMaterial({ color: 'blue', side: THREE.FrontSide })
+    const material = new THREE.MeshStandardMaterial({ color: 'blue', side: THREE.FrontSide })
     // material.wireframe = true
     const plane = new THREE.Mesh(geometry, material)
     plane.position.y = 0.0
@@ -91,7 +91,7 @@ module.exports = class Ground extends GameObject {
       persistence: 0.2, // 0.2
     }
 
-    const treesPerSquareUnit = 3
+    const treesPerSquareUnit = 1
 
     const totalSquareUnits = this.sizeX * this.sizeY
 
@@ -212,14 +212,17 @@ module.exports = class Ground extends GameObject {
     geometryPlane.verticesNeedUpdate = true
     geometryPlane.computeFaceNormals()
 
-    const materialPlane = new THREE.MeshLambertMaterial({
+    const materialPlane = new THREE.MeshStandardMaterial({
       color: 0xffff00,
       side: THREE.FrontSide,
+      roughness: 1,
+      metallness: 0,
     })
 
     const ground = new THREE.Mesh(geometryPlane, materialPlane)
     geometryPlane.computeVertexNormals()
     ground.name = GROUND_NAME
+    ground.receiveShadow = true
     scene.add(ground)
   }
 }

@@ -67799,7 +67799,7 @@ module.exports = class Ground extends GameObject {
 
   addWater() {
     const geometry = new THREE.PlaneGeometry(this.sizeX, this.sizeY)
-    const material = new THREE.MeshLambertMaterial({ color: 'blue', side: THREE.FrontSide })
+    const material = new THREE.MeshStandardMaterial({ color: 'blue', side: THREE.FrontSide })
     // material.wireframe = true
     const plane = new THREE.Mesh(geometry, material)
     plane.position.y = 0.0
@@ -67868,7 +67868,7 @@ module.exports = class Ground extends GameObject {
       persistence: 0.2, // 0.2
     }
 
-    const treesPerSquareUnit = 3
+    const treesPerSquareUnit = 1
 
     const totalSquareUnits = this.sizeX * this.sizeY
 
@@ -67989,14 +67989,17 @@ module.exports = class Ground extends GameObject {
     geometryPlane.verticesNeedUpdate = true
     geometryPlane.computeFaceNormals()
 
-    const materialPlane = new THREE.MeshLambertMaterial({
+    const materialPlane = new THREE.MeshStandardMaterial({
       color: 0xffff00,
       side: THREE.FrontSide,
+      roughness: 1,
+      metallness: 0,
     })
 
     const ground = new THREE.Mesh(geometryPlane, materialPlane)
     geometryPlane.computeVertexNormals()
     ground.name = GROUND_NAME
+    ground.receiveShadow = true
     scene.add(ground)
   }
 }
@@ -68049,8 +68052,20 @@ module.exports = class Sun extends GameObject {
   constructor(args) {
     super(args)
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
-    scene.add(directionalLight)
+    const light = new THREE.DirectionalLight(
+      'white',
+      1,
+
+    )
+    light.castShadow = true
+    light.position.set(100, 100, 100)
+    scene.add(light)
+
+
+    light.shadow.mapSize.width = 512 // default
+    light.shadow.mapSize.height = 512 // default
+    light.shadow.camera.near = 0.5 // default
+    light.shadow.camera.far = 500 // default
   }
 }
 
@@ -68088,20 +68103,32 @@ module.exports = class Tree extends GameObject {
     pivot.position.x = this.position.x
     pivot.position.y = this.position.y
     pivot.position.z = this.position.z
-    const pineMaterial = new THREE.MeshLambertMaterial({ color: '#2d9e44' })
+    const pineMaterial = new THREE.MeshStandardMaterial({
+      color: '#2d9e44',
+      roughness: 1,
+      metallness: 0,
+    })
 
-    const coneGeometry = new THREE.ConeGeometry(0.3, 0.9, 16)
+    const coneGeometry = new THREE.ConeGeometry(0.3, 0.9, 32)
     const cone = new THREE.Mesh(coneGeometry, pineMaterial)
+    cone.flatShading = false
+    cone.castShadow = true // default is false
     cone.rotation.x = Math.PI * 0.5
     cone.position.z = 0.48
     pivot.add(cone)
 
 
-    const trunkMaterial = new THREE.MeshLambertMaterial({ color: '#1e4726' })
+    const trunkMaterial = new THREE.MeshStandardMaterial({
+      color: '#1e4726',
+      roughness: 1,
+      metallness: 0,
+    })
+
     const trunkGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.03, 8)
     const trunkMesh = new THREE.Mesh(trunkGeometry, trunkMaterial)
     trunkMesh.position.z = 0.015
     trunkMesh.rotation.x = Math.PI * 0.5
+    trunkMesh.castShadow = true // default is false
     pivot.add(trunkMesh)
 
 
@@ -68460,6 +68487,8 @@ function loop() {
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
   })
+  renderer.shadowMap.enabled = true
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap // default THREE.PCFShadowMap
 
   renderer.setSize(window.innerWidth, window.innerHeight)
   document.body.appendChild(renderer.domElement).id = 'canvas'

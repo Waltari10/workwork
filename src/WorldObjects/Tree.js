@@ -31,20 +31,32 @@ module.exports = class Tree extends GameObject {
     pivot.position.x = this.position.x
     pivot.position.y = this.position.y
     pivot.position.z = this.position.z
-    const pineMaterial = new THREE.MeshLambertMaterial({ color: '#2d9e44' })
+    const pineMaterial = new THREE.MeshStandardMaterial({
+      color: '#2d9e44',
+      roughness: 1,
+      metallness: 0,
+    })
 
-    const coneGeometry = new THREE.ConeGeometry(0.3, 0.9, 16)
+    const coneGeometry = new THREE.ConeGeometry(0.3, 0.9, 32)
     const cone = new THREE.Mesh(coneGeometry, pineMaterial)
+    cone.flatShading = false
+    cone.castShadow = true // default is false
     cone.rotation.x = Math.PI * 0.5
     cone.position.z = 0.48
     pivot.add(cone)
 
 
-    const trunkMaterial = new THREE.MeshLambertMaterial({ color: '#1e4726' })
+    const trunkMaterial = new THREE.MeshStandardMaterial({
+      color: '#1e4726',
+      roughness: 1,
+      metallness: 0,
+    })
+
     const trunkGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.03, 8)
     const trunkMesh = new THREE.Mesh(trunkGeometry, trunkMaterial)
     trunkMesh.position.z = 0.015
     trunkMesh.rotation.x = Math.PI * 0.5
+    trunkMesh.castShadow = true // default is false
     pivot.add(trunkMesh)
 
 
