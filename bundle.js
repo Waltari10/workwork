@@ -67799,10 +67799,10 @@ module.exports = class Ground extends GameObject {
 
   addWater() {
     const geometry = new THREE.PlaneGeometry(this.sizeX, this.sizeY)
-    const material = new THREE.MeshLambertMaterial({ color: 'blue', emissive: 'blue', side: THREE.DoubleSide })
-    material.wireframe = true
+    const material = new THREE.MeshLambertMaterial({ color: 'blue', side: THREE.FrontSide })
+    // material.wireframe = true
     const plane = new THREE.Mesh(geometry, material)
-    plane.position.y = 0.5
+    plane.position.y = 0.0
     plane.name = WATER_NAME
     // scene.add(plane)
   }
@@ -67992,14 +67992,11 @@ module.exports = class Ground extends GameObject {
     const materialPlane = new THREE.MeshLambertMaterial({
       color: 0xffff00,
       side: THREE.FrontSide,
-      emissive: 'green',
     })
 
     const ground = new THREE.Mesh(geometryPlane, materialPlane)
-    const helper = new THREE.FaceNormalsHelper(ground, 2, 0x00ff00, 1)
     geometryPlane.computeVertexNormals()
     ground.name = GROUND_NAME
-    scene.add(helper)
     scene.add(ground)
   }
 }
