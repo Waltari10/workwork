@@ -67762,9 +67762,10 @@ module.exports = class Sun extends GameObject {
     super(args)
 
     global.camera = new THREE.PerspectiveCamera(
-      70,
-      window.innerWidth / window.innerHeight,
-      0.0000001,
+      45, // fow
+      1, // window.innerWidth / window.innerHeight,
+      0.1,
+      10000,
     )
 
     const controls = new THREE.MapControls(camera)
@@ -67804,7 +67805,7 @@ module.exports = class Ground extends GameObject {
     const plane = new THREE.Mesh(geometry, material)
     plane.position.y = 0.0
     plane.name = WATER_NAME
-    // scene.add(plane)
+    scene.add(plane)
   }
 
   onMap(position) {
@@ -67959,6 +67960,10 @@ module.exports = class Ground extends GameObject {
 
     const geometryPlane = new THREE.PlaneGeometry(this.sizeX, this.sizeY, resolutionX, resolutionY)
 
+    geometryPlane.castShadow = true
+    // geometryPlane.receiveShadow = true
+    // geometryPlane.castShadow = true
+
     const noise = perlin.generatePerlinNoise(actualResolutionX, actualResolutionY, options)
     const riverPath = this.createRiverPath()
 
@@ -67977,7 +67982,6 @@ module.exports = class Ground extends GameObject {
           // This should be zero when distanceToRiverMiddle is at highest
           // This should be riverDepth when distanceToRiverMiddle is at its lowest
 
-          // This is linear, can you make it logarithmic?
           h -= Math.sin((1 - (distanceToRiverMiddle / riverRadius)) * riverDepth)
         }
 
@@ -68055,17 +68059,38 @@ module.exports = class Sun extends GameObject {
     const light = new THREE.DirectionalLight(
       'white',
       1,
-
     )
-    light.castShadow = true
-    light.position.set(100, 100, 100)
-    scene.add(light)
 
+    // const shadowAreaLength = 20
 
-    light.shadow.mapSize.width = 512 // default
-    light.shadow.mapSize.height = 512 // default
+    // light.castShadow = true
+    // light.shadow.mapSize.width = 2048
+    // light.shadow.mapSize.height = 2048
+    // light.shadow.camera.near = 5.0
+    // light.shadow.camera.far = shadowAreaLength
+    // light.shadow.bias = -0.005
+    // light.shadow.radius = 1
+    // light.shadow.camera.left = -shadowAreaLength
+    // light.shadow.camera.bottom = -shadowAreaLength
+    // light.shadow.camera.right = shadowAreaLength
+    // light.shadow.camera.top = shadowAreaLength
+
+    light.shadow.mapSize.width = 4096 // default is 512
+    light.shadow.mapSize.height = 4096// default is 512
     light.shadow.camera.near = 0.5 // default
     light.shadow.camera.far = 500 // default
+
+    // console.log(light.shadow.camera)
+    light.shadow.camera.top = 100
+    light.shadow.camera.bottom = -100
+    light.shadow.camera.left = -100
+    light.shadow.camera.right = 100
+
+    light.castShadow = true
+    light.position.set(100, 100, 90)
+    scene.add(light)
+
+    light.shadowCameraVisible = true
   }
 }
 
@@ -68489,9 +68514,12 @@ function loop() {
   })
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFSoftShadowMap // default THREE.PCFShadowMap
-
   renderer.setSize(window.innerWidth, window.innerHeight)
   document.body.appendChild(renderer.domElement).id = 'canvas'
+
+  // light.shadowMapWidth = 512
+
+  // light.shadowMapHeight = 512
 
 
   function updateGameObjects() {

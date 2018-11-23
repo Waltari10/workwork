@@ -27,7 +27,7 @@ module.exports = class Ground extends GameObject {
     const plane = new THREE.Mesh(geometry, material)
     plane.position.y = 0.0
     plane.name = WATER_NAME
-    // scene.add(plane)
+    scene.add(plane)
   }
 
   onMap(position) {
@@ -182,6 +182,10 @@ module.exports = class Ground extends GameObject {
 
     const geometryPlane = new THREE.PlaneGeometry(this.sizeX, this.sizeY, resolutionX, resolutionY)
 
+    geometryPlane.castShadow = true
+    // geometryPlane.receiveShadow = true
+    // geometryPlane.castShadow = true
+
     const noise = perlin.generatePerlinNoise(actualResolutionX, actualResolutionY, options)
     const riverPath = this.createRiverPath()
 
@@ -200,7 +204,6 @@ module.exports = class Ground extends GameObject {
           // This should be zero when distanceToRiverMiddle is at highest
           // This should be riverDepth when distanceToRiverMiddle is at its lowest
 
-          // This is linear, can you make it logarithmic?
           h -= Math.sin((1 - (distanceToRiverMiddle / riverRadius)) * riverDepth)
         }
 

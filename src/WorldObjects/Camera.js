@@ -7,9 +7,10 @@ module.exports = class Sun extends GameObject {
     super(args)
 
     global.camera = new THREE.PerspectiveCamera(
-      70,
-      window.innerWidth / window.innerHeight,
-      0.0000001,
+      45, // fow
+      1, // window.innerWidth / window.innerHeight,
+      0.1,
+      10000,
     )
 
     const controls = new THREE.MapControls(camera)
