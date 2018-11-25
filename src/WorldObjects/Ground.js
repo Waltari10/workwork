@@ -177,8 +177,8 @@ module.exports = class Ground extends GameObject {
       persistence: 0.2, // 0.2
     }
 
-    const resolutionX = 20
-    const resolutionY = 20
+    const resolutionX = 100
+    const resolutionY = 100
     const actualResolutionX = resolutionX + 1 // plane adds one vertex
     const actualResolutionY = resolutionY + 1
 
