@@ -67768,6 +67768,13 @@ module.exports = class Sun extends GameObject {
       10000,
     )
 
+    //  camera = new THREE.PerspectiveCamera(
+    // 45,// Field of view
+    // 1,// Aspect ratio
+    // 0.1,// Near
+    // 10000 // Far
+    // );
+
     const controls = new THREE.MapControls(camera)
     camera.position.set(0, 0, 15)
     controls.update()
@@ -68112,18 +68119,18 @@ module.exports = class Sun extends GameObject {
     // light.shadow.camera.right = shadowAreaLength
     // light.shadow.camera.top = shadowAreaLength
 
-    light.shadow.mapSize.width = 4096 // default is 512
-    light.shadow.mapSize.height = 4096// default is 512
-    light.shadow.camera.near = 0.5 // default
-    light.shadow.camera.far = 500 // default
+    light.castShadow = true
+    light.shadow.camera.near = 0.5
+    light.shadow.camera.far = 500
+    light.shadow.radius = 1
+    light.shadow.mapSize.width = 2048 // default is 512
+    light.shadow.mapSize.height = 2048// default is 512
 
-    // console.log(light.shadow.camera)
     light.shadow.camera.top = 100
     light.shadow.camera.bottom = -100
     light.shadow.camera.left = -100
     light.shadow.camera.right = 100
 
-    light.castShadow = true
     light.position.set(-100, -100, 90)
     scene.add(light)
 

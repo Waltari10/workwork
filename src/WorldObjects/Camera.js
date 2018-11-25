@@ -13,6 +13,13 @@ module.exports = class Sun extends GameObject {
       10000,
     )
 
+    //  camera = new THREE.PerspectiveCamera(
+    // 45,// Field of view
+    // 1,// Aspect ratio
+    // 0.1,// Near
+    // 10000 // Far
+    // );
+
     const controls = new THREE.MapControls(camera)
     camera.position.set(0, 0, 15)
     controls.update()
