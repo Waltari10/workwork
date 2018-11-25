@@ -67805,6 +67805,8 @@ module.exports = class Ground extends GameObject {
     const plane = new THREE.Mesh(geometry, material)
     plane.position.y = 0.0
     plane.name = WATER_NAME
+    plane.receiveShadow = true
+    // plane.castShadow = true
     scene.add(plane)
   }
 
