@@ -67799,14 +67799,14 @@ module.exports = class Ground extends GameObject {
   }
 
   addWater() {
-    const geometry = new THREE.PlaneGeometry(this.sizeX, this.sizeY)
+    const geometry = new THREE.PlaneGeometry(
+      this.sizeX - (this.sizeX / 55), this.sizeY - (this.sizeY / 55),
+    )
     const material = new THREE.MeshStandardMaterial({ color: 'blue', side: THREE.FrontSide })
-    // material.wireframe = true
     const plane = new THREE.Mesh(geometry, material)
     plane.position.y = 0.0
     plane.name = WATER_NAME
     plane.receiveShadow = true
-    // plane.castShadow = true
     scene.add(plane)
   }
 
@@ -67947,6 +67947,7 @@ module.exports = class Ground extends GameObject {
     return shortestDistance
   }
 
+  // TODO: Add mesh directly down to hide sides of world.
   createGround() {
     const options = {
       octaveCount: 4, // 4 defaults
@@ -67963,8 +67964,6 @@ module.exports = class Ground extends GameObject {
     const geometryPlane = new THREE.PlaneGeometry(this.sizeX, this.sizeY, resolutionX, resolutionY)
 
     geometryPlane.castShadow = true
-    // geometryPlane.receiveShadow = true
-    // geometryPlane.castShadow = true
 
     const noise = perlin.generatePerlinNoise(actualResolutionX, actualResolutionY, options)
     const riverPath = this.createRiverPath()
@@ -67987,7 +67986,19 @@ module.exports = class Ground extends GameObject {
           h -= Math.sin((1 - (distanceToRiverMiddle / riverRadius)) * riverDepth)
         }
 
-        geometryPlane.vertices[i].z = h
+
+        // Wrap the sides down. 
+        if (
+          x === 0 ||
+          y === 0 ||
+          x === resolutionX ||
+          y === resolutionY
+        ) {
+          geometryPlane.vertices[i].z = -1
+        } else {
+          geometryPlane.vertices[i].z = h
+        }
+
         i++
       }
     }
@@ -68089,7 +68100,7 @@ module.exports = class Sun extends GameObject {
     light.shadow.camera.right = 100
 
     light.castShadow = true
-    light.position.set(100, 100, 90)
+    light.position.set(-100, -100, 90)
     scene.add(light)
 
     light.shadowCameraVisible = true

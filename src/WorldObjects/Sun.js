@@ -35,7 +35,7 @@ module.exports = class Sun extends GameObject {
     light.shadow.camera.right = 100
 
     light.castShadow = true
-    light.position.set(100, 100, 90)
+    light.position.set(-100, -100, 90)
     scene.add(light)
 
     light.shadowCameraVisible = true
