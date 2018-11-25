@@ -22,7 +22,7 @@ module.exports = class Ground extends GameObject {
 
   addWater() {
     const geometry = new THREE.PlaneGeometry(
-      this.sizeX - (this.sizeX / 55), this.sizeY - (this.sizeY / 55),
+      this.sizeX - (this.sizeX / 90), this.sizeY - (this.sizeY / 90),
     )
     const material = new THREE.MeshStandardMaterial({ color: 'blue', side: THREE.FrontSide })
     const plane = new THREE.Mesh(geometry, material)
@@ -177,13 +177,18 @@ module.exports = class Ground extends GameObject {
       persistence: 0.2, // 0.2
     }
 
-    const resolutionX = 100
-    const resolutionY = 100
+    const resolutionX = 20
+    const resolutionY = 20
     const actualResolutionX = resolutionX + 1 // plane adds one vertex
     const actualResolutionY = resolutionY + 1
 
 
-    const geometryPlane = new THREE.PlaneGeometry(this.sizeX, this.sizeY, resolutionX, resolutionY)
+    const geometryPlane = new THREE.PlaneGeometry(
+      this.sizeX + ((this.sizeX / actualResolutionX) * 2),
+      this.sizeY + ((this.sizeY / actualResolutionY) * 2),
+      resolutionX,
+      resolutionY,
+    )
 
     geometryPlane.castShadow = true
 
@@ -209,7 +214,25 @@ module.exports = class Ground extends GameObject {
         }
 
 
-        // Wrap the sides down. 
+        // Wrap sides directly down by moving the outer vertices a bit inwards.
+        if (x === 0) {
+          geometryPlane.vertices[i].y -= (this.sizeY / actualResolutionY)
+        }
+
+        if (x === resolutionX) {
+          geometryPlane.vertices[i].y += (this.sizeY / actualResolutionY)
+        }
+
+        if (y === 0) { 
+          geometryPlane.vertices[i].x += (this.sizeX / actualResolutionX)
+        }
+
+        if (y === resolutionY) {
+          geometryPlane.vertices[i].x -= (this.sizeX / actualResolutionX)
+        }
+
+
+        // Wrap the sides down
         if (
           x === 0 ||
           y === 0 ||
@@ -232,8 +255,9 @@ module.exports = class Ground extends GameObject {
       color: 0xffff00,
       side: THREE.FrontSide,
       roughness: 1,
-      metallness: 0,
     })
+
+    // materialPlane.wireframe = true
 
     const ground = new THREE.Mesh(geometryPlane, materialPlane)
     geometryPlane.computeVertexNormals()

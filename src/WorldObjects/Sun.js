@@ -39,5 +39,6 @@ module.exports = class Sun extends GameObject {
     scene.add(light)
 
     light.shadowCameraVisible = true
+
   }
 }

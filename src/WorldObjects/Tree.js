@@ -34,7 +34,6 @@ module.exports = class Tree extends GameObject {
     const pineMaterial = new THREE.MeshStandardMaterial({
       color: '#2d9e44',
       roughness: 1,
-      metallness: 0,
     })
 
     const coneGeometry = new THREE.ConeGeometry(0.3, 0.9, 32)
@@ -49,7 +48,6 @@ module.exports = class Tree extends GameObject {
     const trunkMaterial = new THREE.MeshStandardMaterial({
       color: '#1e4726',
       roughness: 1,
-      metallness: 0,
     })
 
     const trunkGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.03, 8)
