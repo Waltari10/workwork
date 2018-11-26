@@ -67768,13 +67768,6 @@ module.exports = class Sun extends GameObject {
       10000,
     )
 
-    //  camera = new THREE.PerspectiveCamera(
-    // 45,// Field of view
-    // 1,// Aspect ratio
-    // 0.1,// Near
-    // 10000 // Far
-    // );
-
     const controls = new THREE.MapControls(camera)
     camera.position.set(0, 0, 15)
     controls.update()
@@ -67806,15 +67799,18 @@ module.exports = class Ground extends GameObject {
   }
 
   addWater() {
-    const geometry = new THREE.PlaneGeometry(
-      this.sizeX - (this.sizeX / 90), this.sizeY - (this.sizeY / 90),
+    const geometry = new THREE.BoxGeometry(
+      this.sizeX - (this.sizeX / 90), // width
+      this.sizeY - (this.sizeY / 90), // height
+      0.7, // depth
     )
     const material = new THREE.MeshStandardMaterial({ color: 'blue', side: THREE.FrontSide })
-    const plane = new THREE.Mesh(geometry, material)
-    plane.position.y = 0.0
-    plane.name = WATER_NAME
-    plane.receiveShadow = true
-    scene.add(plane)
+    const box = new THREE.Mesh(geometry, material)
+    box.position.y = 0.0
+    box.position.z = -0.33 // higher value raises, lower value lowers.
+    box.name = WATER_NAME
+    box.receiveShadow = true
+    scene.add(box)
   }
 
   onMap(position) {
@@ -68008,7 +68004,7 @@ module.exports = class Ground extends GameObject {
           geometryPlane.vertices[i].y += (this.sizeY / actualResolutionY)
         }
 
-        if (y === 0) { 
+        if (y === 0) {
           geometryPlane.vertices[i].x += (this.sizeX / actualResolutionX)
         }
 
